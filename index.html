@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCH Profile Maker</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#eef1f5;
+  font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo",sans-serif;
+  color:#263142;
+}
+
+.app{
+  display:grid;
+  grid-template-columns:360px 1fr;
+  gap:20px;
+  padding:18px;
+}
+
+.panel,.previewWrap{
+  background:#ffffff;
+  border:1px solid #dfe4ea;
+  border-radius:12px;
+  padding:22px;
+}
+
+h1{margin-top:0;font-size:28px}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:900;
+  color:#7b8998;
+  margin-top:16px;
+}
+
+input,textarea,select{
+  width:100%;
+  margin-top:6px;
+  padding:10px 12px;
+  border:1px solid #d4dce5;
+  border-radius:8px;
+  font-family:inherit;
+  font-size:14px;
+}
+
+textarea{
+  min-height:92px;
+  resize:vertical;
+}
+
+button{
+  margin-top:18px;
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:8px;
+  background:#263142;
+  color:white;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.profile{
+  --main:#2f86e8;
+  --deep:#163c91;
+  --soft:#f3f8ff;
+  --row:#e4f0ff;
+  --box:#eaf3ff;
+  --line:#0f5fd2;
+
+  max-width:980px;
+  margin:auto;
+  overflow:hidden;
+  border-radius:12px;
+}
+
+.profile.guide{
+  background:#eeeeee;
+  color:#344152;
+}
+
+.profile.sentinel{
+  background:#0f1115;
+  color:#f4f6f8;
+}
+
+.hero{
+  position:relative;
+  width:100%;
+  height:0;
+  padding-top:56.25%;
+  overflow:hidden;
+  background-color:#111;
+  background-image:var(--hero-image);
+  background-size:cover;
+  background-position:var(--hero-x, 50%) var(--hero-y, 50%);
+  background-repeat:no-repeat;
+  border-bottom:4px solid var(--line);
+}
+
+.hero img{
+  display:none;
+}
+
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(0,0,0,.78) 0%,
+    rgba(0,0,0,.48) 38%,
+    rgba(0,0,0,.08) 80%
+  );
+}
+
+.badge{
+  position:absolute;
+  z-index:2;
+  top:28px;
+  right:32px;
+  padding:10px 18px;
+  border-radius:7px;
+  background:var(--main);
+  color:#fff;
+  font-size:15px;
+  font-weight:950;
+  letter-spacing:2px;
+}
+
+.guide .badge{
+  background:var(--main);
+  color:#fff;
+}
+
+.heroText{
+  position:absolute;
+  z-index:2;
+  left:44px;
+  bottom:44px;
+  color:#fff;
+}
+
+.threat{
+  font-size:17px;
+  font-weight:950;
+  letter-spacing:4px;
+  color:var(--main);
+  text-shadow:0 2px 8px rgba(0,0,0,.65);
+}
+
+.name{
+  font-size:76px;
+  line-height:1;
+  font-weight:950;
+  margin:10px 0 16px;
+  color:#fff;
+  text-shadow:0 4px 10px rgba(0,0,0,.55);
+}
+
+.catchphrase{
+  max-width:760px;
+  font-size:19px;
+  font-weight:600;
+  line-height:1.65;
+  color:#fff;
+  text-shadow:0 2px 8px rgba(0,0,0,.65);
+}
+
+.content{
+  padding:42px;
+}
+
+.card{
+  border-radius:12px;
+  padding:38px 42px;
+  margin-bottom:30px;
+}
+
+.guide .card{
+  background:#ffffff;
+  border:1px solid #e1e5ea;
+}
+
+.sentinel .card{
+  background:#191a1c;
+  border:1px solid #2b2d31;
+}
+
+.sectionTitle{
+  font-size:26px;
+  font-weight:950;
+  letter-spacing:4px;
+  color:var(--deep);
+  margin-bottom:18px;
+}
+
+.sentinel .sectionTitle{
+  color:var(--main);
+}
+
+.line{
+  height:3px;
+  background:var(--line);
+  margin-bottom:28px;
+}
+
+.infoRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:18px;
+  border-radius:6px;
+  padding:14px 20px;
+  margin-bottom:12px;
+  font-size:15px;
+}
+
+.guide .infoRow{
+  background:var(--row);
+}
+
+.sentinel .infoRow{
+  background:#111214;
+}
+
+.infoRow b:first-child{
+  color:var(--main);
+  letter-spacing:.5px;
+}
+
+.infoRow b:last-child{
+  color:var(--deep);
+  text-align:right;
+}
+
+.sentinel .infoRow b:last-child{
+  color:#fff;
+}
+
+.evalTitle{
+  margin-top:34px;
+  margin-bottom:14px;
+  font-size:16px;
+  font-weight:900;
+  color:var(--main);
+}
+
+.quoteBox{
+  border-left:5px solid var(--line);
+  border-radius:0 7px 7px 0;
+  padding:22px 26px;
+  font-size:16px;
+  line-height:1.9;
+  font-style:italic;
+}
+
+.guide .quoteBox{
+  background:var(--box);
+  color:var(--deep);
+}
+
+.sentinel .quoteBox{
+  background:#17202a;
+  color:#f4f6f8;
+}
+
+.abilityBox,
+.gearBox{
+  border-left:5px solid var(--line);
+  border-radius:0 7px 7px 0;
+  padding:22px 26px;
+  font-size:15px;
+  line-height:1.95;
+}
+
+.abilityBox{
+  margin-bottom:24px;
+}
+
+.guide .abilityBox,
+.guide .gearBox{
+  background:var(--box);
+  color:var(--deep);
+}
+
+.sentinel .abilityBox,
+.sentinel .gearBox{
+  background:#17202a;
+  color:#f4f6f8;
+}
+
+.abilityBox h3{
+  margin:0 0 10px;
+  font-size:18px;
+  color:var(--deep);
+}
+
+.sentinel .abilityBox h3{
+  color:var(--main);
+}
+
+.gearBox{
+  white-space:pre-line;
+}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  .name{font-size:52px}
+  .heroText{left:28px;bottom:30px}
+  .content{padding:26px}
+  .card{padding:28px 24px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="panel">
+    <h1>ARCH Profile Maker</h1>
+
+    <label>타입</label>
+    <select id="type">
+      <option value="sentinel">Sentinel</option>
+      <option value="guide">Guide</option>
+    </select>
+
+    <label>속성</label>
+    <select id="element">
+      <option value="water">물 속성</option>
+      <option value="fire">불 속성</option>
+      <option value="thunder">번개 속성</option>
+      <option value="ice">얼음 속성</option>
+      <option value="grass">풀 속성</option>
+      <option value="wind">바람 속성</option>
+      <option value="none">무속성</option>
+    </select>
+
+    <label>상단 이미지</label>
+    <input type="file" id="image" accept="image/*">
+
+    <label>이미지 가로 위치</label>
+    <input type="range" id="heroX" min="0" max="100" value="50">
+
+    <label>이미지 세로 위치</label>
+    <input type="range" id="heroY" min="0" max="100" value="50">
+
+    <label>등급 배지</label>
+    <input id="badge">
+
+    <label>위협 등급</label>
+    <input id="threat">
+
+    <label>코드네임</label>
+    <input id="name">
+
+    <label>캐치프레이즈</label>
+    <textarea id="catchphrase"></textarea>
+
+    <label>분류</label>
+    <input id="classification">
+
+    <label>나이 / 국적</label>
+    <input id="age">
+
+    <label>공식 평가</label>
+    <textarea id="official"></textarea>
+
+    <label>능력명</label>
+    <input id="abilityName">
+
+    <label>능력 설명</label>
+    <textarea id="abilityText"></textarea>
+
+    <label>버프 / 기어 / 스킬</label>
+    <textarea id="gearText"></textarea>
+
+    <button onclick="saveImage()">이미지로 저장</button>
+  </div>
+
+  <div class="previewWrap">
+    <div id="preview"></div>
+  </div>
+
+</div>
+
+<script>
+let imageSrc = "";
+
+const palettes = {
+  water:{
+    main:"#2f86e8",
+    deep:"#163c91",
+    soft:"#f3f8ff",
+    row:"#e4f0ff",
+    box:"#eaf3ff",
+    line:"#0f5fd2",
+    label:"[ 물 (Aqua) ]"
+  },
+  fire:{
+    main:"#ef3d32",
+    deep:"#9c1f1a",
+    soft:"#fff4f2",
+    row:"#ffe3df",
+    box:"#fff0ed",
+    line:"#e8332a",
+    label:"[ 불 (Pyre) ]"
+  },
+  thunder:{
+    main:"#f6c400",
+    deep:"#8a6200",
+    soft:"#fffbea",
+    row:"#fff1b8",
+    box:"#fff7d6",
+    line:"#f3b900",
+    label:"[ 번개 (Fulmen) ]"
+  },
+  ice:{
+    main:"#8bd9d4",
+    deep:"#397c82",
+    soft:"#f1fbfb",
+    row:"#dcf5f4",
+    box:"#eafafa",
+    line:"#83d6d1",
+    label:"[ 얼음 (Glacies) ]"
+  },
+  grass:{
+    main:"#64b35f",
+    deep:"#2d7337",
+    soft:"#f3fbf2",
+    row:"#e0f2df",
+    box:"#ecf8eb",
+    line:"#55aa57",
+    label:"[ 풀 (Verde) ]"
+  },
+  wind:{
+    main:"#2ecc71",
+    deep:"#1f7f5a",
+    soft:"#f0fbf6",
+    row:"#dcf6ea",
+    box:"#e9fbf2",
+    line:"#26b96a",
+    label:"[ 바람 (Aero) ]"
+  },
+  none:{
+    main:"#8b97a3",
+    deep:"#4b5563",
+    soft:"#f6f7f8",
+    row:"#eceff2",
+    box:"#f2f3f4",
+    line:"#9aa3ad",
+    label:"[ 무속성 (Non-Attribute) ]"
+  }
+};
+
+document.querySelectorAll("input, textarea, select").forEach(el=>{
+  el.addEventListener("input", render);
+});
+
+document.getElementById("image").addEventListener("change", e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    imageSrc = reader.result;
+    render();
+  };
+  reader.readAsDataURL(file);
+});
+
+function esc(str){
+  return String(str || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+}
+
+function nl2br(str){
+  return esc(str).replaceAll("\n","<br>");
+}
+
+function getVars(p){
+  return `
+    --main:${p.main};
+    --deep:${p.deep};
+    --soft:${p.soft};
+    --row:${p.row};
+    --box:${p.box};
+    --line:${p.line};
+  `;
+}
+
+function buildHTML(){
+  const type = document.getElementById("type").value;
+  const element = document.getElementById("element").value;
+  const p = palettes[element];
+
+  const badge = esc(document.getElementById("badge").value).toUpperCase();
+  const threat = esc(document.getElementById("threat").value).toUpperCase();
+  const name = esc(document.getElementById("name").value).toUpperCase();
+  const catchphrase = nl2br(document.getElementById("catchphrase").value);
+  const classification = esc(document.getElementById("classification").value);
+  const age = esc(document.getElementById("age").value);
+  const official = nl2br(document.getElementById("official").value);
+  const abilityName = esc(document.getElementById("abilityName").value);
+  const abilityText = nl2br(document.getElementById("abilityText").value);
+  const gearText = nl2br(document.getElementById("gearText").value);
+  const heroX = document.getElementById("heroX").value;
+  const heroY = document.getElementById("heroY").value;
+
+  return `
+<div class="profile ${type}" style="${getVars(p)}">
+  <div class="hero" style="background-image:${imageSrc ? `url(&quot;${imageSrc}&quot;)` : `none`}; --hero-x:${heroX}%; --hero-y:${heroY}%;">
+    <div class="badge">${badge}</div>
+    <div class="heroText">
+      <div class="threat">${threat}</div>
+      <div class="name">${name}</div>
+      <div class="catchphrase">${catchphrase}</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="card">
+      <div class="sectionTitle">AGENT PROFILE</div>
+      <div class="line"></div>
+
+      <div class="infoRow"><b>CODE NAME</b><b>${name}</b></div>
+      <div class="infoRow"><b>CLASSIFICATION</b><b>${classification}</b></div>
+      <div class="infoRow"><b>ATTRIBUTE</b><b>${p.label}</b></div>
+      <div class="infoRow"><b>AGE/NATIONALITY</b><b>${age}</b></div>
+
+      <div class="evalTitle">OFFICIAL EVALUATION</div>
+      <div class="quoteBox">"${official}"</div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle">ABILITY OVERVIEW</div>
+      <div class="line"></div>
+
+      <div class="abilityBox">
+        <h3>${abilityName}</h3>
+        ${abilityText}
+      </div>
+
+      <div class="gearBox">${gearText}</div>
+    </div>
+
+  </div>
+</div>`;
+}
+
+function render(){
+  const html = buildHTML();
+  document.getElementById("preview").innerHTML = html;
+}
+
+function saveImage(){
+  const target = document.querySelector("#preview .profile");
+
+  html2canvas(target, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: null
+  }).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "arch-profile.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
+
+render();
+</script>
+</body>
+</html>
