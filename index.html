@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCH Profile Maker</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#eef1f5;
+  font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo",sans-serif;
+  color:#263142;
+}
+
+.app{
+  display:grid;
+  grid-template-columns:360px 1fr;
+  gap:20px;
+  padding:18px;
+}
+
+.panel,.previewWrap{
+  background:#ffffff;
+  border:1px solid #dfe4ea;
+  border-radius:12px;
+  padding:22px;
+}
+
+h1{margin-top:0;font-size:28px}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:900;
+  color:#7b8998;
+  margin-top:16px;
+}
+
+input,textarea,select{
+  width:100%;
+  margin-top:6px;
+  padding:10px 12px;
+  border:1px solid #d4dce5;
+  border-radius:8px;
+  font-family:inherit;
+  font-size:14px;
+}
+
+input.colorOverride{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+textarea{
+  min-height:92px;
+  resize:vertical;
+}
+
+button{
+  margin-top:18px;
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:8px;
+  background:#263142;
+  color:white;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.profile{
+  --profileWidth:857px;
+  --main:#2f86e8;
+  --deep:#163c91;
+  --soft:#f3f8ff;
+  --row:#e4f0ff;
+  --box:#eaf3ff;
+  --line:#0f5fd2;
+  --alertBox:#eaf3ff;
+  --alertText:#163c91;
+  --alertTitle:#2f86e8;
+  --alertBar:#0f5fd2;
+  --alertDark:rgba(47,134,232,.14);
+  --abilityDark:#15171a;
+  --overheatDark:rgba(47,134,232,.08);
+  --overheatTitle:#8ecfff;
+  --overheatBar:#45aaff;
+  --guideMain:#168bd8;
+  --guideDeep:#183a56;
+  --guideSoft:#f7fbfd;
+  --guideRow:#e6f2f8;
+  --guideBox:#eaf5fb;
+  --guideLine:#168bd8;
+  --guideText:#314b66;
+  --heroAccent:var(--main);
+  --guideHeroAccent:var(--guideMain);
+  --abilityNameColor:var(--main);
+  --guideAbilityNameColor:var(--guideMain);
+  --skillNameColor:var(--main);
+  --guideSkillNameColor:var(--guideMain);
+  --overheatNameColor:var(--overheatTitle);
+  --guideOverheatNameColor:var(--guideMain);
+
+  max-width:var(--profileWidth);
+  margin:auto;
+  overflow:hidden;
+  border-radius:12px;
+}
+
+.profile.guide{
+  background:#ffffff;
+  color:var(--guideText);
+}
+
+.profile.sentinel{
+  background:#0f1115;
+  color:#f4f6f8;
+}
+
+.hero{
+  position:relative;
+  width:100%;
+  height:0;
+  padding-top:72%;
+  overflow:hidden;
+  background-color:#111;
+  background-image:var(--hero-image);
+  background-size:cover;
+  background-position:var(--hero-x, 50%) var(--hero-y, 50%);
+  background-repeat:no-repeat;
+  border-bottom:4px solid var(--line);
+}
+
+.hero img{
+  display:none;
+}
+
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(0,0,0,.78) 0%,
+    rgba(0,0,0,.48) 38%,
+    rgba(0,0,0,.08) 80%
+  );
+}
+
+.badge{
+  position:absolute;
+  z-index:2;
+  top:28px;
+  right:32px;
+  padding:10px 18px;
+  border-radius:7px;
+  background:var(--heroAccent);
+  color:#fff;
+  font-size:14px;
+  font-weight:950;
+  letter-spacing:2px;
+}
+
+.guide .badge{
+  background:var(--guideHeroAccent);
+  color:#fff;
+}
+
+.guide .hero{
+  border-bottom-color:var(--guideLine);
+}
+
+.guide .threat{
+  color:var(--guideHeroAccent);
+}
+
+.heroText{
+  position:absolute;
+  z-index:2;
+  left:44px;
+  bottom:44px;
+  color:#fff;
+}
+
+.threat{
+  font-size:16px;
+  font-weight:950;
+  letter-spacing:4px;
+  color:var(--heroAccent);
+  text-shadow:0 2px 8px rgba(0,0,0,.65);
+}
+
+.name{
+  font-size:70px;
+  line-height:1;
+  font-weight:950;
+  margin:10px 0 16px;
+  color:#fff;
+  text-shadow:0 4px 10px rgba(0,0,0,.55);
+}
+
+.catchphrase{
+  max-width:760px;
+  font-size:17px;
+  font-weight:500;
+  line-height:1.65;
+  color:#dedede;
+  text-shadow:0 2px 8px rgba(0,0,0,.65);
+}
+
+.content{
+  padding:38px 34px 44px;
+}
+
+.card{
+  border-radius:12px;
+  padding:34px 32px;
+  margin-bottom:28px;
+}
+
+.guide .card{
+  background:var(--guideSoft);
+  border:1px solid rgba(24,58,86,.10);
+}
+
+.sentinel .card{
+  background:#191a1c;
+  border:1px solid #2b2d31;
+}
+
+.sectionTitle{
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:1.6px;
+  color:var(--deep);
+  margin-bottom:12px;
+}
+
+.guide .sectionTitle{
+  color:var(--guideMain);
+}
+
+.guide .card:first-child .sectionTitle{
+  color:var(--guideDeep);
+}
+
+.sentinel .sectionTitle{
+  color:var(--main);
+}
+
+.sentinel .card:first-child .sectionTitle{
+  color:#fff;
+}
+
+.sentinel .card:not(:first-child) .sectionTitle{
+  letter-spacing:1.4px;
+}
+
+.line{
+  height:2px;
+  background:var(--line);
+  margin-bottom:22px;
+}
+
+.guide .line{
+  background:#d8dde2;
+}
+
+.guide .card:first-child .line{
+  background:var(--guideLine);
+}
+
+.sentinel .card:not(:first-child) .line{
+  background:#4a4a4a;
+  height:2px;
+}
+
+.infoRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:18px;
+  border-radius:6px;
+  padding:14px 20px;
+  margin-bottom:12px;
+  font-size:15px;
+}
+
+.guide .infoRow{
+  background:var(--guideRow);
+}
+
+.sentinel .infoRow{
+  background:#111214;
+}
+
+.infoRow b:first-child{
+  color:var(--main);
+  letter-spacing:.5px;
+}
+
+.guide .infoRow b:first-child{
+  color:#5d7184;
+}
+
+.sentinel .infoRow b:first-child{
+  color:#b9b9b9;
+}
+
+.infoRow b:last-child{
+  color:var(--deep);
+  text-align:right;
+}
+
+.guide .infoRow b:last-child{
+  color:var(--guideDeep);
+}
+
+.guide .infoRow.attributeRow b:last-child{
+  color:var(--guideMain);
+}
+
+.sentinel .infoRow b:last-child{
+  color:#fff;
+}
+
+.sentinel .infoRow.attributeRow b:last-child{
+  color:var(--main);
+}
+
+.evalTitle{
+  margin-top:36px;
+  margin-bottom:14px;
+  font-size:16px;
+  font-weight:900;
+  color:var(--main);
+}
+
+.guide .evalTitle{
+  color:#5d7184;
+}
+
+.sentinel .card:first-child .evalTitle{
+  color:#b9b9b9;
+}
+
+.quoteBox{
+  border-left:5px solid var(--line);
+  border-radius:0 7px 7px 0;
+  padding:18px 22px;
+  font-size:15px;
+  line-height:1.72;
+  font-style:italic;
+}
+
+.guide .quoteBox{
+  border-left-color:var(--guideLine);
+  background:var(--guideBox);
+  color:var(--guideText);
+}
+
+.sentinel .quoteBox{
+  background:var(--alertDark);
+  color:#f4f6f8;
+}
+
+.abilityBox,
+.overheatBox{
+  position:relative;
+  overflow:hidden;
+  border-radius:7px;
+  padding:14px 18px 14px 22px;
+  font-size:14px;
+  line-height:1.58;
+}
+
+.abilityBox::before,
+.overheatBox::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:3px;
+  border-radius:999px;
+  background:var(--line);
+}
+
+.guide .abilityBox::before{
+  background:var(--guideLine);
+}
+
+.abilityBox{
+  margin-bottom:20px;
+}
+
+.guide .abilityBox{
+  background:rgba(24,58,86,.045);
+  color:var(--guideText);
+}
+
+.sentinel .abilityBox{
+  background:var(--abilityDark);
+  color:#f4f6f8;
+}
+
+.abilityBox h3{
+  margin:0 0 7px;
+  font-size:16px;
+  color:var(--deep);
+}
+
+.titleSub{
+  color:#a9a9ad;
+  font-weight:600;
+}
+
+.guide .abilityBox .titleSub{
+  color:var(--guideAbilityNameColor);
+  opacity:.85;
+}
+
+.sentinel .abilityBox .titleSub{
+  color:var(--abilityNameColor);
+  opacity:.75;
+}
+
+.guide .abilityBox h3{
+  color:var(--guideAbilityNameColor);
+}
+
+.sentinel .abilityBox h3{
+  color:var(--abilityNameColor);
+}
+
+.skillSection{
+  margin:0 0 22px;
+}
+
+.skillTitle{
+  margin:0 0 10px;
+  color:#b9b9b9;
+  font-size:14px;
+  font-weight:750;
+  letter-spacing:.8px;
+}
+
+.guide .skillTitle{
+  color:#5d7184;
+}
+
+.majorSkillList{
+  margin:0;
+  padding:0;
+  list-style:none;
+  font-size:14px;
+  line-height:1.62;
+}
+
+.majorSkillList li{
+  position:relative;
+  padding-left:16px;
+  margin:0 0 7px;
+}
+
+.majorSkillList li::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.86em;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--main);
+}
+
+.guide .majorSkillList li::before{
+  background:var(--guideMain);
+}
+
+.skillName{
+  color:var(--skillNameColor);
+  font-weight:900;
+}
+
+.guide .skillName{
+  color:var(--guideSkillNameColor);
+}
+
+.skillNameMuted{
+  font-weight:900;
+  color:inherit;
+}
+
+.overheatBox::before{
+  background:var(--overheatBar);
+}
+
+.guide .overheatBox::before{
+  background:var(--guideLine);
+}
+
+.guide .overheatBox{
+  background:var(--guideBox);
+  color:var(--guideText);
+}
+
+.sentinel .overheatBox{
+  background:var(--overheatDark);
+  color:#f4f0ef;
+}
+
+.overheatBox h3{
+  margin:0 0 7px;
+  color:var(--overheatNameColor);
+  font-size:16px;
+}
+
+.guide .overheatBox h3{
+  color:var(--guideOverheatNameColor);
+}
+
+.guide .overheatBox .overheatList{
+  margin-top:4px;
+}
+
+.guide .overheatBox .overheatList li{
+  margin-bottom:8px;
+}
+
+.guide .overheatBox .overheatList li:last-child{
+  margin-bottom:0;
+}
+
+@media(max-width:760px){
+  .app{grid-template-columns:1fr}
+  .name{font-size:52px}
+  .heroText{left:28px;bottom:30px}
+  .content{padding:26px}
+  .card{padding:28px 24px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="panel">
+    <h1>ARCH Profile Maker</h1>
+
+    <label>타입</label>
+    <select id="type">
+      <option value="sentinel">Sentinel</option>
+      <option value="guide">Guide</option>
+    </select>
+
+    <label>속성</label>
+    <select id="element">
+      <option value="water">물 속성</option>
+      <option value="fire">불 속성</option>
+      <option value="thunder">번개 속성</option>
+      <option value="ice">얼음 속성</option>
+      <option value="grass">풀 속성</option>
+      <option value="wind">바람 속성</option>
+      <option value="none">무속성</option>
+    </select>
+
+    <label>상단 이미지</label>
+    <input type="file" id="image" accept="image/*">
+
+    <label>이미지 가로 위치</label>
+    <input type="range" id="heroX" min="0" max="100" value="50">
+
+    <label>이미지 세로 위치</label>
+    <input type="range" id="heroY" min="0" max="100" value="50">
+
+    <label>등급 배지</label>
+    <input id="badge" placeholder="A / S / C">
+
+    <label>위협 등급</label>
+    <input id="threat" placeholder="THREAT LEVEL: BEFORE THE RIPPLE">
+
+    <label>등급 배지 / 위협 등급 색상</label>
+    <input id="heroAccentColor" class="colorOverride" placeholder="#2f86e8">
+
+    <label>상단 코드네임</label>
+    <input id="name">
+
+    <label>프로필 코드네임</label>
+    <input id="profileName" placeholder="루비 (Ruby)">
+
+    <label>캐치프레이즈</label>
+    <textarea id="catchphrase"></textarea>
+
+    <label>분류</label>
+    <input id="classification">
+
+    <label>나이 / 국적</label>
+    <input id="age">
+
+    <label>공식 평가</label>
+    <textarea id="official"></textarea>
+
+    <label>프로필 섹션 제목</label>
+    <input id="profileSectionTitle" placeholder="AGENT PROFILE / GUIDE PROFILE">
+
+    <label>능력 섹션 제목</label>
+    <input id="abilitySectionTitle" placeholder="ABILITY OVERVIEW / ABILITY & GEAR">
+
+    <label>능력명</label>
+    <input id="abilityName">
+
+    <label>능력명 색상</label>
+    <input id="abilityNameColor" class="colorOverride" placeholder="#ffd21f">
+
+    <label>능력 설명</label>
+    <textarea id="abilityText"></textarea>
+
+    <label>중간 목록 제목</label>
+    <input id="skillSectionTitle" placeholder="MAJOR SKILLS / SPECIAL NOTES / CHARM POINTS">
+
+    <label>중간 목록 내용</label>
+    <textarea id="skillText" placeholder="퀸즈 블레이드: 거대한 화염 대검을 소환해 적을 내려칩니다."></textarea>
+
+    <label>스킬명 색상</label>
+    <input id="skillNameColor" class="colorOverride" placeholder="#ffd21f">
+
+    <label>하단 강조 제목</label>
+    <input id="overheatName" placeholder="폭주 징조: 과열 (OVERHEAT) / Guiding Buff & Special Gear">
+
+    <label>폭주명 색상</label>
+    <input id="overheatNameColor" class="colorOverride" placeholder="#ffc08a">
+
+    <label>하단 강조 설명</label>
+    <textarea id="overheatText" placeholder="Guide: 줄바꿈으로 항목 구분. ':' 앞은 자동 강조. 강조 없이 굵게만 하려면 **라벨**로 감싸기 (예: **핵심 가이딩 버프: 오토에임(AUTO AIM)** 대상의 시각적 초점을...)"></textarea>
+
+    <button onclick="saveImage()">이미지로 저장</button>
+  </div>
+
+  <div class="previewWrap">
+    <div id="preview"></div>
+  </div>
+
+</div>
+
+<script>
+let imageSrc = "";
+
+const palettes = {
+  water:{
+    main:"#24a8e8",
+    deep:"#1268a8",
+    soft:"#f3f8ff",
+    row:"#e4f0ff",
+    box:"#eaf3ff",
+    line:"#168bd8",
+    alertBox:"#eef8ff",
+    alertText:"#24556f",
+    alertTitle:"#36bdf4",
+    alertBar:"#1aa7e5",
+    alertDark:"rgba(36,168,232,.13)",
+    abilityDark:"#131517",
+    overheatDark:"#151c2b",
+    overheatTitle:"#8ecbff",
+    overheatBar:"#4db8ff",
+    guideMain:"#155ac5",
+    guideDeep:"#183a56",
+    guideSoft:"#f7f9fd",
+    guideRow:"#e6eef7",
+    guideBox:"#dfe8f6",
+    guideLine:"#155ac5",
+    guideText:"#31475f",
+    label:"[ 물 (Aqua) ]"
+  },
+  fire:{
+    main:"#ef3d32",
+    deep:"#9c1f1a",
+    soft:"#fff4f2",
+    row:"#ffe3df",
+    box:"#fff0ed",
+    line:"#e8332a",
+    alertBox:"#fff0ed",
+    alertText:"#5f2420",
+    alertTitle:"#ff9a9a",
+    alertBar:"#ff3b30",
+    alertDark:"rgba(255,59,48,.14)",
+    abilityDark:"#131313",
+    overheatDark:"#351f1d",
+    overheatTitle:"#ff9a9a",
+    overheatBar:"#ff1f1f",
+    guideMain:"#d83333",
+    guideDeep:"#3a2424",
+    guideSoft:"#fff8f8",
+    guideRow:"#f9e5e4",
+    guideBox:"#fff0ef",
+    guideLine:"#ff3b1f",
+    guideText:"#4f3834",
+    label:"[ 불 (Pyre) ]"
+  },
+  thunder:{
+    main:"#ffd21f",
+    deep:"#8a6a00",
+    soft:"#fffbea",
+    row:"#fff1b8",
+    box:"#fff7d6",
+    line:"#ffd21f",
+    alertBox:"#fff9dc",
+    alertText:"#5e4b17",
+    alertTitle:"#ffd72e",
+    alertBar:"#ffd21f",
+    alertDark:"rgba(255,210,31,.11)",
+    abilityDark:"#131313",
+    overheatDark:"rgba(255,122,31,.15)",
+    overheatTitle:"#ffc08a",
+    overheatBar:"#ff7a1f",
+    guideMain:"#f4a21e",
+    guideDeep:"#34414a",
+    guideSoft:"#fffce8",
+    guideRow:"#fff5bd",
+    guideBox:"#fff9df",
+    guideLine:"#ffd400",
+    guideText:"#3f5360",
+    label:"[ 번개 (Fulmen) ]"
+  },
+  ice:{
+    main:"#a7e8f7",
+    deep:"#4b8495",
+    soft:"#f1fbfb",
+    row:"#dcf5f4",
+    box:"#eafafa",
+    line:"#a7e8f7",
+    alertBox:"#effcfc",
+    alertText:"#386876",
+    alertTitle:"#a7e8f7",
+    alertBar:"#a7e8f7",
+    alertDark:"rgba(167,232,247,.13)",
+    abilityDark:"#131517",
+    overheatDark:"#183735",
+    overheatTitle:"#bdf6ff",
+    overheatBar:"#34f2e4",
+    guideMain:"#12b8c8",
+    guideDeep:"#183a56",
+    guideSoft:"#f4fbfd",
+    guideRow:"#dcf3f8",
+    guideBox:"#e0f4fa",
+    guideLine:"#12bfd0",
+    guideText:"#344f68",
+    label:"[ 얼음 (Glacies) ]"
+  },
+  grass:{
+    main:"#66c66f",
+    deep:"#32733b",
+    soft:"#f3fbf2",
+    row:"#e0f2df",
+    box:"#ecf8eb",
+    line:"#2f8b3c",
+    alertBox:"#eff9ed",
+    alertText:"#365f39",
+    alertTitle:"#72c879",
+    alertBar:"#2f8b3c",
+    alertDark:"rgba(102,198,111,.12)",
+    abilityDark:"#131612",
+    overheatDark:"#142417",
+    overheatTitle:"#a9dfa4",
+    overheatBar:"#70c879",
+    guideMain:"#4caf58",
+    guideDeep:"#183a56",
+    guideSoft:"#f8fbf7",
+    guideRow:"#e9f2ea",
+    guideBox:"#e9f5e8",
+    guideLine:"#48b85c",
+    guideText:"#314b66",
+    label:"[ 풀 (Verde) ]"
+  },
+  wind:{
+    main:"#49d9c9",
+    deep:"#267b72",
+    soft:"#f0fbf6",
+    row:"#dcf6ea",
+    box:"#e9fbf2",
+    line:"#43d2c2",
+    alertBox:"#ecfbf9",
+    alertText:"#2c635e",
+    alertTitle:"#5ce2d4",
+    alertBar:"#43d2c2",
+    alertDark:"rgba(73,217,201,.13)",
+    abilityDark:"#131717",
+    overheatDark:"#1b302e",
+    overheatTitle:"#79eadf",
+    overheatBar:"#58ddcf",
+    guideMain:"#18aa91",
+    guideDeep:"#183a56",
+    guideSoft:"#f7fcfb",
+    guideRow:"#e3f5f1",
+    guideBox:"#e8f6f4",
+    guideLine:"#18b99f",
+    guideText:"#314b66",
+    label:"[ 바람 (Aero) ]"
+  },
+  none:{
+    main:"#8b97a3",
+    deep:"#4b5563",
+    soft:"#f6f7f8",
+    row:"#eceff2",
+    box:"#f2f3f4",
+    line:"#9aa3ad",
+    alertBox:"#f2f3f4",
+    alertText:"#4b5563",
+    alertTitle:"#b7c0ca",
+    alertBar:"#9aa3ad",
+    alertDark:"rgba(154,163,173,.14)",
+    abilityDark:"#141516",
+    overheatDark:"rgba(154,163,173,.08)",
+    overheatTitle:"#c5cbd3",
+    overheatBar:"#9aa3ad",
+    guideMain:"#6b7280",
+    guideDeep:"#344152",
+    guideSoft:"#f7f8fa",
+    guideRow:"#eceff2",
+    guideBox:"#f0f2f4",
+    guideLine:"#9aa3ad",
+    guideText:"#344152",
+    label:"[ 무속성 (Non-Attribute) ]"
+  }
+};
+
+document.querySelectorAll("input, textarea, select").forEach(el=>{
+  el.addEventListener("input", render);
+});
+
+document.getElementById("image").addEventListener("change", e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    imageSrc = reader.result;
+    render();
+  };
+  reader.readAsDataURL(file);
+});
+
+function esc(str){
+  return String(str || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+}
+
+function nl2br(str){
+  return esc(str).replaceAll("\n","<br>");
+}
+
+function formatBadge(str){
+  const value = String(str || "").trim().toUpperCase();
+  if(!value) return "";
+  if(value.includes("CLASS ENTITY")) return esc(value);
+  return `${esc(value.replace(/-?CLASS$/,""))}-CLASS ENTITY`;
+}
+
+function formatBracketLabel(str){
+  const value = String(str || "").trim().toUpperCase();
+  if(!value) return "";
+  if(value.startsWith("[") && value.endsWith("]")) return esc(value);
+  return `[ ${esc(value)} ]`;
+}
+
+function formatTitle(str){
+  const safe = esc(str);
+  return safe.replace(/\s*(\([^()]+\))$/, ` <span class="titleSub">$1</span>`);
+}
+
+function colorValue(id){
+  const value = String(document.getElementById(id).value || "").trim();
+  return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(value) ? value : "";
+}
+
+function skillList(str){
+  const lines = String(str || "")
+    .split("\n")
+    .map(line => {
+      const trimmed = line.trim();
+      // If line starts with **, don't strip — that's markdown, not a bullet char
+      if(trimmed.startsWith("**")) return trimmed;
+      return trimmed.replace(/^[•*\-]\s*/, "");
+    })
+    .filter(Boolean);
+
+  if(!lines.length) return "";
+
+  return lines.map(line => {
+    // Check for **...** wrapped label at start (muted/non-accent bold)
+    const mutedMatch = line.match(/^\*\*([^*]+)\*\*(.*)$/);
+    if(mutedMatch){
+      const labelText = esc(mutedMatch[1]);
+      const rest = esc(mutedMatch[2]);
+      return `<li><span class="skillNameMuted">${labelText}</span>${rest}</li>`;
+    }
+
+    const safe = esc(line);
+    const divider = safe.indexOf(":");
+
+    if(divider === -1){
+      return `<li>${safe}</li>`;
+    }
+
+    const skillName = safe.slice(0, divider + 1);
+    const skillDesc = safe.slice(divider + 1);
+    return `<li><span class="skillName">${skillName}</span>${skillDesc}</li>`;
+  }).join("");
+}
+
+function getVars(p){
+  return `
+    --main:${p.main};
+    --deep:${p.deep};
+    --soft:${p.soft};
+    --row:${p.row};
+    --box:${p.box};
+    --line:${p.line};
+    --alertBox:${p.alertBox};
+    --alertText:${p.alertText};
+    --alertTitle:${p.alertTitle};
+    --alertBar:${p.alertBar};
+    --alertDark:${p.alertDark};
+    --abilityDark:${p.abilityDark || p.alertDark};
+    --overheatDark:${p.overheatDark || p.alertDark};
+    --overheatTitle:${p.overheatTitle || p.alertTitle};
+    --overheatBar:${p.overheatBar || p.alertBar};
+    --guideMain:${p.guideMain || p.main};
+    --guideDeep:${p.guideDeep || p.deep};
+    --guideSoft:${p.guideSoft || p.soft};
+    --guideRow:${p.guideRow || p.row};
+    --guideBox:${p.guideBox || p.box};
+    --guideLine:${p.guideLine || p.line};
+    --guideText:${p.guideText || p.deep};
+  `;
+}
+
+function buildHTML(){
+  const type = document.getElementById("type").value;
+  const element = document.getElementById("element").value;
+  const p = palettes[element];
+
+  const badge = formatBadge(document.getElementById("badge").value);
+  const threat = formatBracketLabel(document.getElementById("threat").value);
+  const name = esc(document.getElementById("name").value).toUpperCase();
+  const profileName = esc(document.getElementById("profileName").value) || name;
+  const catchphrase = nl2br(document.getElementById("catchphrase").value);
+  const classification = esc(document.getElementById("classification").value);
+  const age = esc(document.getElementById("age").value);
+  const official = nl2br(document.getElementById("official").value);
+  const defaultProfileTitle = type === "guide" ? "GUIDE PROFILE" : "AGENT PROFILE";
+  const defaultAbilityTitle = type === "guide" ? "ABILITY & GEAR" : "ABILITY OVERVIEW";
+  const profileSectionTitle = esc(document.getElementById("profileSectionTitle").value) || defaultProfileTitle;
+  const abilitySectionTitle = esc(document.getElementById("abilitySectionTitle").value) || defaultAbilityTitle;
+  const abilityName = formatTitle(document.getElementById("abilityName").value);
+  const abilityText = nl2br(document.getElementById("abilityText").value);
+  const skillSectionTitle = esc(document.getElementById("skillSectionTitle").value) || "MAJOR SKILLS";
+  const skillText = skillList(document.getElementById("skillText").value);
+  const overheatName = esc(document.getElementById("overheatName").value);
+  const overheatTextRaw = document.getElementById("overheatText").value;
+  const overheatText = nl2br(overheatTextRaw);
+  const overheatList = skillList(overheatTextRaw);
+  const heroX = document.getElementById("heroX").value;
+  const heroY = document.getElementById("heroY").value;
+  const heroAccentColor = colorValue("heroAccentColor");
+  const abilityNameColor = colorValue("abilityNameColor");
+  const skillNameColor = colorValue("skillNameColor");
+  const overheatNameColor = colorValue("overheatNameColor");
+  const overrideVars = `
+    ${heroAccentColor ? `--heroAccent:${heroAccentColor}; --guideHeroAccent:${heroAccentColor};` : ""}
+    ${abilityNameColor ? `--abilityNameColor:${abilityNameColor}; --guideAbilityNameColor:${abilityNameColor};` : ""}
+    ${skillNameColor ? `--skillNameColor:${skillNameColor}; --guideSkillNameColor:${skillNameColor};` : ""}
+    ${overheatNameColor ? `--overheatNameColor:${overheatNameColor}; --guideOverheatNameColor:${overheatNameColor};` : ""}
+  `;
+
+  return `
+<div class="profile ${type}" style="${getVars(p)} ${overrideVars}">
+  <div class="hero" style="background-image:${imageSrc ? `url(&quot;${imageSrc}&quot;)` : `none`}; --hero-x:${heroX}%; --hero-y:${heroY}%;">
+    <div class="badge">${badge}</div>
+    <div class="heroText">
+      <div class="threat">${threat}</div>
+      <div class="name">${name}</div>
+      <div class="catchphrase">${catchphrase}</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="card">
+      <div class="sectionTitle">${profileSectionTitle}</div>
+      <div class="line"></div>
+
+      <div class="infoRow"><b>CODE NAME</b><b>${profileName}</b></div>
+      <div class="infoRow"><b>CLASSIFICATION</b><b>${classification}</b></div>
+      <div class="infoRow attributeRow"><b>ATTRIBUTE</b><b>${p.label}</b></div>
+      <div class="infoRow"><b>AGE/NATIONALITY</b><b>${age}</b></div>
+
+      <div class="evalTitle">OFFICIAL EVALUATION</div>
+      <div class="quoteBox">"${official}"</div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle">${abilitySectionTitle}</div>
+      <div class="line"></div>
+
+      <div class="abilityBox">
+        <h3>${abilityName}</h3>
+        ${abilityText}
+      </div>
+
+      ${type === "guide" ? `` : `
+      <div class="skillSection">
+        <div class="skillTitle">${skillSectionTitle}</div>
+        <ul class="majorSkillList">${skillText}</ul>
+      </div>
+      `}
+
+      <div class="overheatBox">
+        <h3>${overheatName}</h3>
+        ${type === "guide" && overheatList
+          ? `<ul class="majorSkillList overheatList">${overheatList}</ul>`
+          : overheatText}
+      </div>
+    </div>
+
+  </div>
+</div>`;
+}
+
+function updateFieldVisibility(){
+  const type = document.getElementById("type").value;
+  const isGuide = type === "guide";
+  const skillFieldIds = ["skillSectionTitle", "skillText", "skillNameColor"];
+  skillFieldIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const label = el.previousElementSibling;
+    if(isGuide){
+      el.disabled = true;
+      el.style.opacity = ".4";
+      if(label && label.tagName === "LABEL"){
+        if(!label.dataset.origText) label.dataset.origText = label.textContent;
+        label.textContent = label.dataset.origText + "  (Guide 미사용)";
+        label.style.opacity = ".5";
+      }
+    } else {
+      el.disabled = false;
+      el.style.opacity = "";
+      if(label && label.tagName === "LABEL" && label.dataset.origText){
+        label.textContent = label.dataset.origText;
+        label.style.opacity = "";
+      }
+    }
+  });
+}
+
+function render(){
+  updateFieldVisibility();
+  const html = buildHTML();
+  document.getElementById("preview").innerHTML = html;
+}
+
+function saveImage(){
+  const target = document.querySelector("#preview .profile");
+
+  html2canvas(target, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: null
+  }).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "arch-profile.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
+
+render();
+</script>
+</body>
+</html>
