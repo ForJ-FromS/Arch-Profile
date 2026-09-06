@@ -225,15 +225,17 @@ button{
   padding-top:72%;
   overflow:hidden;
   background-color:#111;
-  background-image:var(--hero-image);
-  background-size:cover;
-  background-position:var(--hero-x, 50%) var(--hero-y, 50%);
-  background-repeat:no-repeat;
   border-bottom:4px solid var(--line);
 }
 
 .hero img{
-  display:none;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:var(--hero-x, 50%) var(--hero-y, 50%);
+  display:block;
 }
 
 .hero::after{
@@ -1188,7 +1190,8 @@ function buildHTML(){
 
   return `
 <div class="profile ${type}" style="${getVars(p)} ${overrideVars} ${detailOverrideVars()}">
-  <div class="hero" style="background-image:${imageSrc ? `url(&quot;${imageSrc}&quot;)` : `none`}; --hero-x:${heroX}%; --hero-y:${heroY}%;">
+  <div class="hero" style="--hero-x:${heroX}%; --hero-y:${heroY}%;">
+    ${imageSrc ? `<img src="${imageSrc}" alt="">` : ``}
     <div class="badge">${badge}</div>
     <div class="heroText">
       <div class="threat">${threat}</div>
@@ -1285,11 +1288,14 @@ function captureAndDownload(selector, filename){
   const target = document.querySelector(selector);
   if(!target){ alert("먼저 미리보기를 생성해주세요."); return; }
 
+  const rect = target.getBoundingClientRect();
   html2canvas(target, {
     scale: 2,
     useCORS: true,
     allowTaint: true,
-    backgroundColor: null
+    backgroundColor: null,
+    width: Math.round(rect.width),
+    height: Math.round(rect.height)
   }).then(canvas => {
     const link = document.createElement("a");
     link.download = filename;
