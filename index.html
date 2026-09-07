@@ -1295,7 +1295,11 @@ function captureAndDownload(selector, filename){
     allowTaint: true,
     backgroundColor: null,
     width: Math.round(rect.width),
-    height: Math.round(rect.height)
+    height: Math.round(rect.height),
+    scrollX: -window.scrollX,
+    scrollY: -window.scrollY,
+    windowWidth: document.documentElement.scrollWidth,
+    windowHeight: document.documentElement.scrollHeight
   }).then(canvas => {
     const link = document.createElement("a");
     link.download = filename;
